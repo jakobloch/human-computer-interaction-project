@@ -3,14 +3,14 @@
 	import { PlusSquare, X } from 'lucide-svelte';
 	import { fade, fly } from 'svelte/transition';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { recipies, ingredient } from '$lib/stores/stores';
+	import { recipies, ingredient, ingredients, steps } from '$lib/stores/stores';
 	import IngredientToken from './IngredientToken.svelte';
 	import { writable } from 'svelte/store';
+	import Step from './Step.svelte';
 
-	let ingredients = writable<any>([]);
-	let steps = writable<string[]>([]);
+	let stepNum: number | null
 	let step = '';
-    let name = ''
+	let name = '';
 
 	const {
 		elements: { trigger, portalled, overlay, content, title, description, close },
@@ -19,7 +19,7 @@
 
 	function addIngredient() {
 		ingredients.update((arr) => {
-			arr.push($ingredient);
+			arr.add($ingredient);
 			return arr;
 		});
 		$ingredient = {
@@ -29,38 +29,54 @@
 		};
 	}
 	function addStep() {
-		steps.update((arr) => {
-			arr.push(step);
+		steps.update((map) => {
+			map.set(stepNum, step);
 			step = '';
+			stepNum = null;
 
-			return arr;
+			return map;
 		});
 	}
 
-    function addRecipie(){
-        recipies.update((map) => {
-            map.set(name, {ingredients: $ingredients, steps: $steps});
+	function addRecipie() {
+		recipies.update((map) => {
+			map.set(name, { ingredients: $ingredients, steps: $steps });
+			console.log(map.get(name))
+			return map;
+		});
+		ingredients.update((set) => {
+			set.clear();
+			return set;
+		});
+		steps.update((map) => {
+			map.clear();
 
-            return map;
-        })
-    }
+			return map;
+		})
+		name = '';
+	}
+
+	function cancelRecipie() {
+		ingredients.update((set) => {
+			set.clear();
+			return set;
+		});
+		steps.update((map) => {
+			map.clear();
+
+			return map;
+		})
+		name = '';
+	}
 </script>
 
-<button
-	use:melt={$trigger}
-	type="button"
-	class="flex flex-col mb-4 items-center relative w-full rounded-lg border-2 border-dashed border-gray-300 px-12 text-center hover:border-gray-400 text-gray-300 hover:text-gray-400 active:text-gray-500 active:border-gray-500"
->
+<button use:melt={$trigger} type="button" class="flex flex-col mb-4 items-center relative w-full rounded-lg border-2 border-dashed border-gray-300 px-12 text-center hover:border-gray-400 text-gray-300 hover:text-gray-400 active:text-gray-500 active:border-gray-500">
 	<PlusSquare size={48} strokeWidth={1} />
 </button>
 
 <div use:portalled class="">
 	{#if $open}
-		<div
-			use:melt={$overlay}
-			class="fixed inset-0 z-50 bg-black/50"
-			transition:fade={{ duration: 150 }}
-		/>
+		<div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" transition:fade={{ duration: 150 }} />
 		<div
 			class="fixed left-[50%] top-[50%] z-50 max-h-[85vh] w-[90vw]
             max-w-[550px] translate-x-[-50%] translate-y-[-50%] rounded-xl bg-white
@@ -71,62 +87,55 @@
 			use:melt={$content}
 		>
 			<h2 use:melt={$title} class="m-0 text-lg font-medium text-black">Create Recipie</h2>
-			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
-				You can always edit this later.
-			</p>
+			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">You can always edit this later.</p>
 
-			<fieldset class="mb-4 flex items-center gap-5">
-				<label class="w-[120px] text-right text-black" for="name">Recipie Name </label>
-				<input
-                    bind:value={name}
-					class="inline-flex h-8 w-full flex-1 items-center justify-center
-                    rounded-sm border border-solid px-3 leading-none text-black"
-					id="recipieName"
-				/>
+			<fieldset class="mb-4 flex flex-col items-start gap-5">
+				<div class="relative border border-gray-300 rounded-lg my-4 w-3/4">
+					<input bind:value={name} type="text" id="recipieName" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" />
+					<label for="recipieName" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Recipie Name</label>
+				</div>
 			</fieldset>
-			<h3 class="w-[120px] text-right text-black">Ingredients</h3>
-			<fieldset class="mb-4 flex items-center gap-5">
-				<TextInput />
 
-				<button on:click={addIngredient}>
-					<PlusSquare />
-				</button>
+			<fieldset class="mb-4 flex flex-col items-start gap-5">
+				<h3 class="w-[120px] text-black font-bold ml-4">Ingredients</h3>
+				<div class="flex">
+					<TextInput />
+
+					<button on:click={addIngredient}>
+						<PlusSquare />
+					</button>
+				</div>
 			</fieldset>
-			<div class="flex">
+			<div class="flex flex-wrap">
 				{#each $ingredients as ingredient}
 					<IngredientToken {ingredient} />
 				{/each}
 			</div>
-			<h3 class="w-[120px] text-right text-black">Steps</h3>
-            <div class="flex justify-between">
-                <div class="relative border border-gray-300 rounded-lg my-4 w-3/4">
-                    <input
-                        bind:value={step}
-                        type="text"
-                        id="step"
-                        class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=""
-                    />
-                    <label
-                        for="step"
-                        class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                        >Instructions</label
-                    >
-                </div>
-                <button on:click={addStep}>
-                    <PlusSquare />
-                </button>
-            </div>
-			
-			<ol class="list-decimal">
-				{#each $steps as step}
-					<li class="mx-2">{step}</li>
+			<h3 class="w-[120px] font-bold ml-4 text-black">Steps</h3>
+			<div class="flex justify-between">
+				<div class="relative border border-gray-300 rounded-lg my-4 w-1/4">
+					<input bind:value={stepNum} type="number" id="number" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" />
+					<label for="number" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Number</label>
+				</div>
+				<div class="relative border border-gray-300 rounded-lg my-4 w-3/4">
+					<input bind:value={step} type="text" id="step" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="" />
+					<label for="step" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1">Instructions</label>
+				</div>
+				<button on:click={addStep}>
+					<PlusSquare />
+				</button>
+			</div>
+
+			<ol class="list-inside indent-8">
+				{#each [...$steps.entries()] as step}
+					<Step num={step[0]} step={step[1]}/>
 				{/each}
 			</ol>
 
 			<div class="mt-6 flex justify-end gap-4">
 				<button
 					use:melt={$close}
+					on:click={cancelRecipie}
 					class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
 				>
@@ -134,7 +143,7 @@
 				</button>
 				<button
 					use:melt={$close}
-                    on:click={addRecipie}
+					on:click={addRecipie}
 					class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
 				>
