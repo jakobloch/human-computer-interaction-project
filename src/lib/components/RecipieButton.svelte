@@ -4,12 +4,20 @@
     export let item: any;
 
     import { createRadioGroup, melt } from '@melt-ui/svelte';
-    import {chosenRecipie} from '$lib/stores/stores'
+    import {chosenRecipie, recipies} from '$lib/stores/stores'
+	import { Trash2 } from 'lucide-svelte';
 
 
 
     function setRecipie() {
         chosenRecipie.set(recipie);
+    }
+    function deleteRecipie() {
+        recipies.update((map) => {
+            map.delete(name);
+			
+            return map;
+        })
     }
 </script>
 
@@ -24,5 +32,7 @@
     >
     {name}
     </button>
-    
+    <button on:click={deleteRecipie} class="text-gray-300 hover:text-gray-400 active:text-gray-500">
+        <Trash2 />
+    </button>
 </div>
