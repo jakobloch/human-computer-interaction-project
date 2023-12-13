@@ -39,7 +39,7 @@
 								<CreateDialog />
 								<div use:melt={$root} class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row" aria-label="View density">
 									{#each [...$recipies.entries()] as recipie}
-										<RecipieButton name={recipie[0]} {recipie} />
+										<RecipieButton name={recipie[0]} {recipie} {item}/>
 									{/each}
 								</div>
 							</div>

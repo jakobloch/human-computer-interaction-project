@@ -1,16 +1,12 @@
 <script lang="ts">
     export let name = ""
     export let recipie: any;
+    export let item: any;
 
     import { createRadioGroup, melt } from '@melt-ui/svelte';
     import {chosenRecipie} from '$lib/stores/stores'
 
-	const {
-		elements: { root, item, hiddenInput },
-		helpers: { isChecked }
-	} = createRadioGroup({
-		defaultValue: 'default'
-	});
+
 
     function setRecipie() {
         chosenRecipie.set(recipie);
