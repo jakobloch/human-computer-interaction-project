@@ -10,7 +10,8 @@
 	import { createRadioGroup, melt } from '@melt-ui/svelte';
 
 	const {
-		elements: { root, item },
+		elements: { root, item, hiddenInput },
+		helpers: { isChecked }
 	} = createRadioGroup({
 		defaultValue: 'default'
 	});
@@ -38,7 +39,7 @@
 								<CreateDialog />
 								<div use:melt={$root} class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row" aria-label="View density">
 									{#each [...$recipies.entries()] as recipie}
-										<RecipieButton name={recipie[0]} {recipie} item={item}/>
+										<RecipieButton name={recipie[0]} {recipie} />
 									{/each}
 								</div>
 							</div>
@@ -51,7 +52,7 @@
 					<section aria-labelledby="section-1-title">
 						<h2 class="sr-only" id="section-1-title">Section title</h2>
 						<div class="overflow-hidden rounded-lg bg-white shadow">
-							<div class="p-6 flex flex-col items-center">
+							<div class="p-6">
                                
 								    <Recipie />
                                 

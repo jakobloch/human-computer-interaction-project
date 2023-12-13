@@ -8,6 +8,4 @@ export const ingredient = writable({
     measurement: "",
     name: ""
 });
-export const chosenRecipie = writable(["", {ingredients:new Set(), steps:new Map()}]);
-export const ingredients = writable(new Set());
-export const steps = writable(new Map());
+export const chosenRecipie = writable(["", {ingredients: [], steps:[]}]);
