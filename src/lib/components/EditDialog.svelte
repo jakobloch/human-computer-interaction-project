@@ -7,8 +7,6 @@
 	import IngredientToken from './IngredientToken.svelte';
 	import Step from './Step.svelte';
 
-	
-	
 	let step = '';
     let name = '';
 
@@ -37,13 +35,13 @@
 		});
 	}
 
-    function addRecipe(){
+    function saveRecipe(){
         recipes.update((map) => {
-			if(!map.has(name)){
+			if(map.has(name)){
 				map.set(name, {name: name, ingredients: $ingredients, steps: $steps});
 			}
 			else{
-				alert("Recipe already exists.")
+				alert("Recipe does not exist.")
 			}
             
 
@@ -155,7 +153,7 @@
 				</button>
 				<button
 					use:melt={$close}
-                    on:click={addRecipe}
+                    on:click={saveRecipe}
 					class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
 				>
