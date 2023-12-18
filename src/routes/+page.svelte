@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CreateDialog from '$lib/components/CreateDialog.svelte';
+	import NewRecipeDialog from '$lib/components/NewRecipeDialog.svelte';
 	import { recipes } from '$lib/stores/stores';
 	import RecipeButton from '$lib/components/RecipeButton.svelte';
     import Recipe from '$lib/components/Recipe.svelte';
@@ -36,7 +36,7 @@
 						<h2 class="sr-only" id="section-2-title">Recipes</h2>
 						<div class="overflow-hidden rounded-lg bg-white shadow">
 							<div class="p-6 flex flex-col">
-								<CreateDialog />
+								<NewRecipeDialog />
 								<div use:melt={$root} class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row" aria-label="View density">
 									{#each [...$recipes.entries()] as recipe}
 										<RecipeButton name={recipe[0]}  {item}/>
