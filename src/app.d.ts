@@ -7,6 +7,19 @@ declare global {
 		// interface PageData {}
 		// interface Platform {}
 	}
+
+	interface Ingredient{
+		amount: string,
+		measurement: string,
+		name: string
+	}
+
+	interface Recipe{
+		name: string,
+		ingredients: Ingredient[],
+		steps: string[]
+	}
+
 }
 
 export {};
