@@ -81,7 +81,7 @@
 		<div
 			class="fixed left-[50%] top-[50%] z-50 max-h-[85vh] w-[90vw]
             max-w-[550px] translate-x-[-50%] translate-y-[-50%] rounded-xl bg-white
-            p-6 shadow-lg overflow-scroll"
+            p-6 shadow-lg overflow-auto"
 			transition:fly={{
 				duration: 150
 			}}
