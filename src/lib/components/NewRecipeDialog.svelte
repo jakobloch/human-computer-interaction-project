@@ -111,7 +111,7 @@
 					<PlusSquare />
 				</button>
 			</fieldset>
-			<div class="flex">
+			<div class="flex flex-wrap">
 				{#each $ingredients as ingredient, index}
 					<IngredientToken {ingredient} {index}/>
 					
